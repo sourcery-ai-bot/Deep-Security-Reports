@@ -5,8 +5,7 @@
 3. Set the API key as a `DS_KEY` environment variable.
 
 # Usage Instructions
-
-Help menu:
+## Help Menu
 
 ```
 $ python3 reporter.py -h
@@ -27,13 +26,15 @@ required arguments:
   --dsm-address DSM_ADDRESS                e.g https://app.deepsecurity.trendmicro.com/api
 ```
 
-Example usage:
+## Example Usage
 
 ```
 python3 reporter.py --dsm-address https://app.deepsecurity.trendmicro.com/api --app-names 'Apache Struts' 'NGINX' 'Internet Explorer'
 ```
 
 Specifying `--app-names` results in an "App Name" column being added to the report CSV file. This enables users to easily group and identify vulnerable applications.
+
+Note that the search is case insensitive. Therefore, in the above example, 'nginx', 'Nginx' and 'NGINX' would all be found.  
 
 # Contact
 
