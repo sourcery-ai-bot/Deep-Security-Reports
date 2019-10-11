@@ -4,6 +4,7 @@ import time
 import sys
 import warnings
 import argparse
+from pprint import pprint
 import deepsecurity as api
 from deepsecurity.rest import ApiException
 
@@ -128,11 +129,22 @@ class Ips(Ds):
 
         rule_info.append('N/A')
 
-    def _add_report_entry(self, base_copy, rule_id):
-        rule = self.ips_rules[rule_id]
+    def _split_cve_entries(self, rule_info, cves, base_copy):
+        rules = []
 
-        if isinstance(rule.cve, list):
-            rule.cve = ', '.join(rule.cve)
+        for cve in cves:
+            new_rule = rule_info.copy()
+            new_rule.insert(8, cve)
+
+            new_base = base_copy.copy()
+            new_base.extend(new_rule)
+
+            rules.append(new_base)
+
+        return rules
+
+    def _add_report_entry(self, base_copy, rule_id, split_cves):
+        rule = self.ips_rules[rule_id]
 
         app_id = rule.application_type_id
         app = self.app_types[app_id]
@@ -152,7 +164,6 @@ class Ips(Ds):
             app_ports,
             app.direction,
             app.protocol,
-            rule.cve,
             rule.cvss_score,
             rule.severity,
             rule.type,
@@ -161,11 +172,21 @@ class Ips(Ds):
         if self.app_names:
             self._app_name_lookup(rule_info)
 
+        if isinstance(rule.cve, list):
+            if split_cves:
+                split_rules = self._split_cve_entries(rule_info, rule.cve, base_copy)
+
+                return split_rules
+
+            else:
+                rule.cve = ', '.join(rule.cve)
+
+        rule_info.insert(8, rule.cve)
         base_copy.extend(rule_info)
 
         return base_copy
 
-    def gather_report_data(self):
+    def gather_report_data(self, split_cves=False):
         report_data = [['Hostname', 'Display Name', 'Host Description', 'Platform', 'Last IP Used', 'Agent Version',
                         'Policy ID', 'Last Agent Comms.', 'IPS Agent State', 'IPS Status', 'Rule Name', 'Rule ID',
                         'Rule Description', 'App Category', 'App Description', 'App Port(s)', 'Direction',
@@ -191,9 +212,13 @@ class Ips(Ds):
             # iterate through applied rules
             for rule_id in data.intrusion_prevention.rule_ids:
                 base_copy = base_computer_details.copy()
-                self._add_report_entry(base_copy, rule_id)
+                output = self._add_report_entry(base_copy, rule_id, split_cves)
 
-                report_data.append(base_copy)
+                if isinstance(output[0], list):
+                    report_data.extend(output)
+
+                else:
+                    report_data.append(output)
 
         return report_data
 
@@ -250,7 +275,7 @@ def main():
 
     ips = Ips(dsm_address, app_names)
 
-    report_data = ips.gather_report_data()
+    report_data = ips.gather_report_data(split_cves=True)
     ips.generate_output(report_data, report_filename)
 
     summary_data = ips.gather_summary_data()
