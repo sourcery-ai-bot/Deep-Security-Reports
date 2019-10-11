@@ -188,6 +188,7 @@ class Ips(Ds):
                 data.intrusion_prevention.module_status.agent_status_message,
             ]
 
+            # iterate through applied rules
             for rule_id in data.intrusion_prevention.rule_ids:
                 base_copy = base_computer_details.copy()
                 self._add_report_entry(base_copy, rule_id)
@@ -197,7 +198,7 @@ class Ips(Ds):
         return report_data
 
     def gather_summary_data(self):
-        report_data = [['Hostname', 'Platform', 'Last Agent Comms.', 'IPS Status', '# of IPS Rules']]
+        summary_data = [['Hostname', 'Platform', 'Last Agent Comms.', 'IPS Status', '# of IPS Rules']]
 
         computers = self.get_computers()
 
@@ -214,9 +215,9 @@ class Ips(Ds):
                 num_rules,
             ]
 
-            report_data.append(computer_details)
+            summary_data.append(computer_details)
 
-        return report_data
+        return summary_data
 
 
 def args_menu():
