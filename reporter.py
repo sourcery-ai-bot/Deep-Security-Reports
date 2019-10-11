@@ -136,6 +136,9 @@ class Ips(Ds):
             new_rule = rule_info.copy()
             new_rule.insert(8, cve)
 
+            cve_year = cve.split('-')[1]
+            new_rule.insert(9, cve_year)
+
             new_base = base_copy.copy()
             new_base.extend(new_rule)
 
@@ -182,6 +185,10 @@ class Ips(Ds):
                 rule.cve = ', '.join(rule.cve)
 
         rule_info.insert(8, rule.cve)
+
+        if split_cves:
+            rule_info.insert(9, '')
+
         base_copy.extend(rule_info)
 
         return base_copy
@@ -191,6 +198,10 @@ class Ips(Ds):
                         'Policy ID', 'Last Agent Comms.', 'IPS Agent State', 'IPS Status', 'Rule Name', 'Rule ID',
                         'Rule Description', 'App Category', 'App Description', 'App Port(s)', 'Direction',
                         'Protocol', 'CVE(s)', 'CVSS Score', 'Severity', 'Rule Type']]
+
+        if split_cves:
+            cve_year_index = report_data[0].index('CVE(s)') + 1
+            report_data[0].insert(cve_year_index, 'CVE Year')
 
         if self.app_names:
             report_data[0].append('App Name')
