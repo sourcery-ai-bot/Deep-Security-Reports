@@ -265,10 +265,8 @@ def args_menu():
                                                                                         '(default: ips_summary.csv')
     parser.add_argument("--app-names", default='', nargs='*', type=str,
                         help='App names to search for in the IPS report')
-
-    required = parser.add_argument_group('required arguments')
-    required.add_argument('--dsm-address', required=True, type=str,
-                          help='e.g https://app.deepsecurity.trendmicro.com/api')
+    parser.add_argument('--dsm-address', default='https://app.deepsecurity.trendmicro.com/api', type=str,
+                        help='e.g https://app.deepsecurity.trendmicro.com/api (default)')
 
     args = parser.parse_args()
     args_dict = vars(args)
