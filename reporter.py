@@ -36,7 +36,7 @@ class Ds:
         except ApiException as e:
             return 'Exception: ' + str(e)
 
-        app_types = dict()
+        app_types = {}
 
         for app in app_list.application_types:
             app_types[app.id] = app
@@ -53,7 +53,7 @@ class Ds:
         except ApiException as e:
             return 'Exception: ' + str(e)
 
-        computers = dict()
+        computers = {}
 
         for computer in computer_list.computers:
             computers[computer.host_name] = computer
@@ -61,7 +61,7 @@ class Ds:
         return computers
 
     def get_ips_rules(self):
-        ips_rules = dict()
+        ips_rules = {}
 
         search_criteria = api.SearchCriteria()
         search_criteria.id_value = 0
@@ -177,9 +177,7 @@ class Ips(Ds):
 
         if isinstance(rule.cve, list):
             if split_cves:
-                split_rules = self._split_cve_entries(rule_info, rule.cve, base_copy)
-
-                return split_rules
+                return self._split_cve_entries(rule_info, rule.cve, base_copy)
 
             else:
                 rule.cve = ', '.join(rule.cve)
@@ -269,9 +267,7 @@ def args_menu():
                         help='e.g https://app.deepsecurity.trendmicro.com/api (default)')
 
     args = parser.parse_args()
-    args_dict = vars(args)
-
-    return args_dict
+    return vars(args)
 
 
 def main():
